@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
     private final AccountRepository repository;
 
-    public AccountController(AccountRepository repository) {
+    private final TransferService transferService;
+
+    public AccountController(AccountRepository repository, TransferService transferService) {
         this.repository = repository;
+        this.transferService = transferService;
     }
 
     @GetMapping("/accounts")
@@ -52,6 +55,13 @@ public class AccountController {
         repository.deleteById(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/accounts/{id}/transfer")
+    public ResponseEntity<?> transferAmmout(@PathVariable Long id, @RequestBody TransferCriteria criteria) {
+        transferService.transferToAccount(id, criteria.getIdTo(), criteria.getAmmountToTransfer());
+
+        return ResponseEntity.ok().build();
     }
 
 }
