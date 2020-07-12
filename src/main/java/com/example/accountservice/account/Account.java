@@ -1,6 +1,7 @@
 package com.example.accountservice.account;
 
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -14,6 +15,8 @@ public class Account {
     private String name;
     private String currency;
     private double balance;
+    
+    @Column(updatable = false)
     private boolean treasury;
 
     Account() {
