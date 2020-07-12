@@ -1,7 +1,6 @@
 package com.example.accountservice.account;
 
-import java.util.List;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,13 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class AccountController {
     private final AccountRepository repository;
 
-    public AccountController(AccountRepository repository) {
+    private final TransferService transferService;
+
+    public AccountController(AccountRepository repository, TransferService transferService) {
         this.repository = repository;
+        this.transferService = transferService;
     }
 
     @GetMapping("/accounts")
-    public List<Account> getAllAccounts() {
-        return repository.findAll();
+    public ResponseEntity<?> getAllAccounts() {
+        return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/accounts/{id}")
@@ -30,12 +32,12 @@ public class AccountController {
     }
 
     @PostMapping("/accounts")
-    public Account createAccount(@RequestBody Account newAccount) {
-        return repository.save(newAccount);
+    public ResponseEntity<?> createAccount(@RequestBody Account newAccount) {
+        return new ResponseEntity<>(repository.save(newAccount), HttpStatus.CREATED);
     }
 
     @PutMapping("/accounts/{id}")
-    public Account updateAccount(@PathVariable Long id, @RequestBody Account newAccount) {
+    public ResponseEntity<?> updateAccount(@PathVariable Long id, @RequestBody Account newAccount) {
         Account updatedAccount = repository.findById(id).map(account -> {
             account.setName(newAccount.getName());
             return repository.save(account);
@@ -44,14 +46,23 @@ public class AccountController {
             return repository.save(newAccount);
         });
 
-        return updatedAccount;
+        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
     }
 
     @DeleteMapping("/accounts/{id}")
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        boolean isPresent = repository.findById(id).isPresent();
+
         repository.deleteById(id);
 
-        return ResponseEntity.noContent().build();
+        return isPresent ? ResponseEntity.accepted().build() : ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/accounts/{id}/transfer")
+    public ResponseEntity<?> transferAmmout(@PathVariable Long id, @RequestBody TransferCriteria criteria) {
+        transferService.transferToAccount(id, criteria.getIdTo(), criteria.getAmmountToTransfer());
+
+        return ResponseEntity.ok().build();
     }
 
 }

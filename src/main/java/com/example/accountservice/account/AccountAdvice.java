@@ -11,4 +11,9 @@ public class AccountAdvice {
     ResponseEntity<?> accountNotFoundHandler(AccountNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+
+    @ExceptionHandler(AccountNotEnoughBalanceException.class)
+    ResponseEntity<?> accountNotEnoughBalanceExceptionHandler(AccountNotEnoughBalanceException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }
