@@ -2,6 +2,7 @@ package com.example.accountservice.account;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,8 +34,8 @@ public class AccountController {
     }
 
     @PostMapping("/accounts")
-    public Account createAccount(@RequestBody Account newAccount) {
-        return repository.save(newAccount);
+    public ResponseEntity<?> createAccount(@RequestBody Account newAccount) {
+        return new ResponseEntity<>(repository.save(newAccount), HttpStatus.CREATED);
     }
 
     @PutMapping("/accounts/{id}")
@@ -52,9 +53,11 @@ public class AccountController {
 
     @DeleteMapping("/accounts/{id}")
     public ResponseEntity<?> deleteAccount(@PathVariable Long id) {
+        boolean isPresent = repository.findById(id).isPresent();
+
         repository.deleteById(id);
 
-        return ResponseEntity.noContent().build();
+        return isPresent ? ResponseEntity.accepted().build() : ResponseEntity.noContent().build();
     }
 
     @PutMapping("/accounts/{id}/transfer")
