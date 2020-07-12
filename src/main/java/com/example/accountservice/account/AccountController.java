@@ -1,7 +1,5 @@
 package com.example.accountservice.account;
 
-import java.util.List;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -24,8 +22,8 @@ public class AccountController {
     }
 
     @GetMapping("/accounts")
-    public List<Account> getAllAccounts() {
-        return repository.findAll();
+    public ResponseEntity<?> getAllAccounts() {
+        return new ResponseEntity<>(repository.findAll(), HttpStatus.OK);
     }
 
     @GetMapping("/accounts/{id}")
@@ -39,7 +37,7 @@ public class AccountController {
     }
 
     @PutMapping("/accounts/{id}")
-    public Account updateAccount(@PathVariable Long id, @RequestBody Account newAccount) {
+    public ResponseEntity<?> updateAccount(@PathVariable Long id, @RequestBody Account newAccount) {
         Account updatedAccount = repository.findById(id).map(account -> {
             account.setName(newAccount.getName());
             return repository.save(account);
@@ -48,7 +46,7 @@ public class AccountController {
             return repository.save(newAccount);
         });
 
-        return updatedAccount;
+        return new ResponseEntity<>(updatedAccount, HttpStatus.OK);
     }
 
     @DeleteMapping("/accounts/{id}")
