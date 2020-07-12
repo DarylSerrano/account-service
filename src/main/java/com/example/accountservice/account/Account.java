@@ -13,7 +13,7 @@ public class Account {
     private @Id @GeneratedValue Long id;
     private String name;
     private String currency;
-    private Double balance;
+    private double balance;
     private boolean treasury;
 
     Account() {
